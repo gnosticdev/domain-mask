@@ -8,7 +8,7 @@ import { prettyJSON } from 'hono/pretty-json'
 /**
  * Sets the base app with the following middleware:
  * - logger
- * - cors (using configured ALLOWED_DOMAINS env variable)
+ * - cors (using configured ALIAS_DOMAIN env variable)
  * - prettyJSON
  * - cache
  */
@@ -16,8 +16,9 @@ export const routeFactory = createFactory<{
 	Bindings: Env
 	Variables: {
 		attributeRewriter: HTMLRewriterElementContentHandlers
-		maskedURL: URL
+		targetURL: URL
 		requestURL: URL
+		forwardHeaders: Headers
 	}
 }>({
 	initApp: (app) => {
@@ -26,7 +27,7 @@ export const routeFactory = createFactory<{
 			logger(),
 			cors({
 				origin: (_origin, c: Context<{ Bindings: Env }>) =>
-					c.env.ALLOWED_DOMAINS.includes(_origin as never) ? _origin : null,
+					c.env.ALIAS_DOMAIN === _origin ? _origin : null,
 			}),
 			prettyJSON(),
 			(c, next) => {
@@ -40,15 +41,6 @@ export const routeFactory = createFactory<{
 					wait: true,
 					cacheControl: 'public, max-age=3600',
 				})(c, next)
-			},
-			(c, next) => {
-				const requestURL = new URL(c.req.url)
-				const maskedURL = new URL(c.env.MASK_DOMAIN)
-				maskedURL.pathname = requestURL.pathname
-				maskedURL.search = requestURL.search
-				c.set('maskedURL', maskedURL)
-				c.set('requestURL', requestURL)
-				return next()
 			},
 		)
 

@@ -1,4 +1,4 @@
-import { transformUrl } from './transform-url'
+import { convertToMaskedURL } from './transform-url'
 
 const IGNORE_DOMAINS = ['google-analytics.com', 'googletagmanager.com']
 
@@ -36,7 +36,11 @@ export function createRewriter({
 					const value = el.getAttribute(attr)
 					if (!value?.includes(maskedURL.hostname)) continue
 
-					const newValue = transformUrl(value, maskedURL, requestURL)
+					const newValue = convertToMaskedURL({
+						originalUrl: value,
+						maskedURL,
+						requestURL,
+					})
 					if (newValue !== value) {
 						el.setAttribute(attr, newValue)
 					}
@@ -83,7 +87,11 @@ export function createRewriter({
 								}
 
 								// Transform the URL
-								const newUrl = transformUrl(decodedUrl, maskedURL, requestURL)
+								const newUrl = convertToMaskedURL({
+									originalUrl: decodedUrl,
+									maskedURL,
+									requestURL,
+								})
 								return `${newUrl} ${size}`.trim()
 							})
 							.join(', ')
@@ -93,7 +101,11 @@ export function createRewriter({
 						// Handle regular src attributes
 						const decodedValue = decodeURIComponent(value)
 						if (decodedValue.includes(maskedURL.hostname)) {
-							const newValue = transformUrl(decodedValue, maskedURL, requestURL)
+							const newValue = convertToMaskedURL({
+								originalUrl: decodedValue,
+								maskedURL,
+								requestURL,
+							})
 							el.setAttribute(attr, newValue)
 						}
 					}
@@ -152,7 +164,11 @@ export function createRewriter({
 
 					// Existing src transformation logic
 					if (value.includes(maskedURL.hostname)) {
-						const newValue = transformUrl(value, maskedURL, requestURL)
+						const newValue = convertToMaskedURL({
+							originalUrl: value,
+							maskedURL,
+							requestURL,
+						})
 						if (newValue !== value) {
 							el.setAttribute(attr, newValue)
 						}

@@ -4,41 +4,41 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "example-domain-mask", // change this to the name of your worker
+	"name": "domain-mask", // change this to the name of your worker
 	"main": "src/index.ts",
 	"compatibility_date": "2025-09-16",
+
+	// ****************************************************************
+	// CUSTOM DOMAIN
+	// ****************************************************************
+	// if you want to use a custom domain, uncomment the following block
+	// make sure there is no CNAME record for the domain in your Cloudflare DNS
 	// "route": {
 	// "custom_domain": true,
 	// "pattern": "example.com" // change this to the domain you want to mask
 	// },
-	"observability": {
-		"enabled": true
-	},
 
+	"observability": {
+		"enabled": true // optional, but recommended
+	},
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
 	"placement": {
-		"mode": "smart"
+		"mode": "smart" // optional, but recommended
 	},
-
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-
 	/**
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
 	"vars": {
-		"ALLOWED_DOMAINS": ["example.com"], // change this to the domains you want to allow
-		"MASK_DOMAIN": "https://www.example-mask.com", // change this to the domain you want to mask
+		// the domain for this worker to allow requests from
+		"ALIAS_DOMAIN": "example.com", // change this to the domain you want to allow
+		// the domain you want to mask
+		"TARGET_DOMAIN": "httpbin.org", // change this to the domain you want to mask
 		"ENVIRONMENT": "production",
-		"BUN_VERSION": "1.2.2"
+		"BUN_VERSION": "1.2.2" // Cloudflare specific variable for building the worker
 	},
 	"env": {
 		"development": {
@@ -48,26 +48,18 @@
 				"pattern": "localhost:8787" // keep for local development
 			},
 			"vars": {
-				"ALLOWED_DOMAINS": ["localhost"], // keep for local development
-				"MASK_DOMAIN": "https://www.example-mask.com", // change this to the domain you want to mask
+				"ALIAS_DOMAIN": "localhost", // change this to the domain you want to allow
+				"TARGET_DOMAIN": "httpbin.org", // change this to the domain you want to mask
 				"ENVIRONMENT": "development"
 			}
 		}
 	}
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
 
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
+	 *
+	 * Could use this to apply this worker to multiple domains
 	 */
 	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }

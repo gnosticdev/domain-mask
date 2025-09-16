@@ -1,8 +1,8 @@
 {
 	"name": "domain-mask",
 	"scripts": {
-		"dev": "bun run typegen --env development && wrangler dev --env development",
-		"deploy": "wrangler deploy --minify",
+		"dev": "bun run typegen && wrangler dev --env development --live-reload",
+		"deploy": "wrangler deploy",
 		"typegen": "wrangler types env.d.ts --env-interface Env",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check . --write"
@@ -11,6 +11,7 @@
 		"hono": "^4.9.7",
 		"kleur": "^4.1.5"
 	},
+	"packageManager": "bun@1.2.2",
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.4",
 		"typescript": "^5.9.2",

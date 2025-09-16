@@ -1,12 +1,13 @@
 import type { StatusCode } from 'hono/utils/http-status'
 import { routeFactory } from './factory'
-import { headersMiddleware } from './middleware'
+import { headersMiddleware, postMiddleware, preMiddleware } from './middleware'
 import { createRewriter } from './rewriter'
-import { transformUrl } from './transform-url'
+import { convertToMaskedURL } from './transform-url'
 
 const app = routeFactory.createApp()
 
-app.use('*', headersMiddleware)
+// set middleware
+app.use('*', preMiddleware, headersMiddleware, postMiddleware)
 
 /**
  * Set the robots.txt file to block all crawlers
@@ -25,10 +26,10 @@ app.get('/robots.txt', (c) => {
  */
 app.all('*', async (c) => {
 	const requestURL = c.get('requestURL')
-	const maskedURL = c.get('maskedURL')
+	const maskedURL = c.get('targetURL')
 
 	console.log(`request from ${requestURL.href}`)
-	// if (!c.env.ALLOWED_DOMAINS.includes(requestURL.hostname as never)) {
+	// if (!c.env.ALIAS_DOMAIN.includes(requestURL.hostname as never)) {
 	// 	return c.text('Not allowed', 403)
 	// }
 
@@ -56,7 +57,8 @@ app.all('*', async (c) => {
 			method: c.req.method,
 			headers,
 			body,
-			redirect: 'follow',
+			// if we follow redirects, the masking domain will be visible in the redirect chain
+			redirect: 'manual',
 		})
 
 		// For PHP responses that might return JSON or other content types
@@ -91,13 +93,17 @@ app.all('*', async (c) => {
 			})
 		}
 
-		// Handle CSS files specifically
+		// Handle CSS files specifically and replace any `url()` references with the requestURL
 		if (contentType?.includes('text/css')) {
 			const cssText = await maskResponse.text()
 			const processedCss = cssText.replace(
 				/url\(['"]?(.*?)['"]?\)/g,
 				(_match, url) => {
-					const newUrl = transformUrl(url, maskedURL, requestURL)
+					const newUrl = convertToMaskedURL({
+						originalUrl: url,
+						maskedURL,
+						requestURL,
+					})
 					return `url("${newUrl}")`
 				},
 			)

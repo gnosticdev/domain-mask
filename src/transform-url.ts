@@ -5,11 +5,21 @@
  * @param requestURL - The request URL
  * @returns The transformed URL
  */
-export function transformUrl(
-	originalUrl: string,
-	maskedURL: URL,
-	requestURL: URL,
-): string {
+export function convertToMaskedURL({
+	originalUrl,
+	maskedURL,
+	requestURL,
+}: {
+	/**
+	 * The URL sent by the client
+	 */
+	originalUrl: string
+	/**
+	 * The masked URL (c.env.TARGET_DOMAIN)
+	 */
+	maskedURL: URL
+	requestURL: URL
+}): string {
 	try {
 		// Skip data URLs and non-http(s) URLs
 		if (
@@ -19,7 +29,7 @@ export function transformUrl(
 			return originalUrl
 		}
 
-		// Convert to absolute URL
+		// Convert relative to absolute URL
 		const absoluteUrl = originalUrl.startsWith('/')
 			? `${maskedURL.protocol}://${maskedURL.hostname}${originalUrl}`
 			: new URL(originalUrl).toString()
