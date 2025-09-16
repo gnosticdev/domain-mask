@@ -1,0 +1,52 @@
+# mac
+.DS_STORE
+Thumbs.db
+
+# Log files
+*.log
+log/
+logs/
+
+########################
+# Typescript
+########################
+# Dependency directories
+node_modules
+# TypeScript cache
+*.tsbuildinfo
+
+# build outputs
+.next
+out
+dist
+.astro
+.wrangler
+
+# environment vars
+*.env*
+!.env.example
+
+# cloudflare env vars
+.dev.vars
+
+########################
+# Python
+########################
+# Dependency directories
+venv/
+.venv/
+.pycache/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+
+########################
+# PHP
+########################
+# Dependency directories
+vendor/
