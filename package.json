@@ -5,7 +5,11 @@
 		"deploy": "wrangler deploy",
 		"typegen": "wrangler types env.d.ts --env-interface Env",
 		"typecheck": "tsc --noEmit",
-		"lint": "biome check . --write"
+		"lint": "biome check . --write",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:watch": "vitest --watch"
 	},
 	"dependencies": {
 		"hono": "^4.9.7",
@@ -14,7 +18,9 @@
 	"packageManager": "bun@1.2.2",
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.4",
+		"@cloudflare/vitest-pool-workers": "^0.9.2",
 		"typescript": "^5.9.2",
+		"vitest": "^3.2.4",
 		"wrangler": "^4.37.1"
 	}
 }

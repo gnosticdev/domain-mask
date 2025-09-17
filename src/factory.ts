@@ -5,6 +5,13 @@ import { createFactory } from 'hono/factory'
 import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 
+export type HonoVariables = {
+	attributeRewriter: HTMLRewriterElementContentHandlers
+	targetURL: URL
+	requestURL: URL
+	forwardHeaders: Headers
+}
+
 /**
  * Sets the base app with the following middleware:
  * - logger
@@ -14,12 +21,7 @@ import { prettyJSON } from 'hono/pretty-json'
  */
 export const routeFactory = createFactory<{
 	Bindings: Env
-	Variables: {
-		attributeRewriter: HTMLRewriterElementContentHandlers
-		targetURL: URL
-		requestURL: URL
-		forwardHeaders: Headers
-	}
+	Variables: HonoVariables
 }>({
 	initApp: (app) => {
 		app.use(
